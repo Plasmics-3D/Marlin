@@ -217,12 +217,13 @@
   #define E2_CS_PIN                         PE1
 #endif
 
-#define E3_STEP_PIN                         PE6   // MOTOR 7
-#define E3_DIR_PIN                          PA14
-#define E3_ENABLE_PIN                       PE0
-#ifndef E3_CS_PIN
-  #define E3_CS_PIN                         PD3
-#endif
+// E3 is disabled because Max31865 
+//#define E3_STEP_PIN                         PE6   // MOTOR 7
+//#define E3_DIR_PIN                          PA14
+//#define E3_ENABLE_PIN                       PE0
+//#ifndef E3_CS_PIN
+//  #define E3_CS_PIN                         PD3
+//#endif
 
 //
 // Temperature Sensors

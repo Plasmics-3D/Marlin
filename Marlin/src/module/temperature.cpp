@@ -3239,7 +3239,7 @@ void Temperature::disable_all_heaters() {
 
       #if HAS_MAX31865
         MAX31865 &max865ref = THERMO_SEL(max31865_0, max31865_1, max31865_2);
-        max_tc_temp = TERN(LIB_INTERNAL_MAX31865, max865ref.readRaw(), max865ref.readRTD_with_Fault());
+        max_tc_temp = TERN(LIB_INTERNAL_MAX31865, max865ref.readRaw(), max865ref.readRTD_with_Fault()); // readRaw reads the temp from sensor
       #endif
     #endif
 
@@ -3260,9 +3260,9 @@ void Temperature::disable_all_heaters() {
           else if (max_tc_temp & 0x4)
             SERIAL_ECHOLNPGM("Short to VCC");
         #elif HAS_MAX31865
-          const uint8_t fault_31865 = max865ref.readFault();
+          const uint8_t fault_31865 = max865ref.readFault(); 
           max865ref.clearFault();
-          if (fault_31865) {
+          if (fault_31865) { // Reading fails here
             SERIAL_EOL();
             SERIAL_ECHOLNPGM("\nMAX31865 Fault: (", fault_31865, ")  >>");
             if (fault_31865 & MAX31865_FAULT_HIGHTHRESH)
@@ -3426,6 +3426,7 @@ public:
 };
 
 /**
+ * Temp ISR: 
  * Handle various ~1kHz tasks associated with temperature
  *  - Check laser safety timeout
  *  - Heater PWM (~1kHz with scaler)
@@ -3434,8 +3435,10 @@ public:
  *  - Advance Babysteps
  *  - Endstop polling
  *  - Planner clean buffer
+ * 
+ *  ? max318xx checking ?
  */
-void Temperature::isr() {
+void Temperature::isr() { 
 
   // Shut down the laser if steppers are inactive for > LASER_SAFETY_TIMEOUT_MS ms
   #if LASER_SAFETY_TIMEOUT_MS > 0
