@@ -32,7 +32,7 @@
   #define TEMP_0_PIN                        PF4   // TH0
 #endif
 
-//Thermocouple pinouts
+//INO pinouts
 #define TEMP_0_SCK_PIN PA5
 #define TEMP_0_MISO_PIN PA6
 #define TEMP_0_MOSI_PIN PA7

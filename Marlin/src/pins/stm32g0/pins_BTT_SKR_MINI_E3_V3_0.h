@@ -439,3 +439,9 @@
 #ifndef NEOPIXEL_PIN
   #define NEOPIXEL_PIN                      PA8   // LED driving pin
 #endif
+
+// INO pinouts
+#define TEMP_0_SCK_PIN PA5
+#define TEMP_0_MISO_PIN PA6
+#define TEMP_0_MOSI_PIN PA7
+#define TEMP_0_CS_PIN PD3 // PD3 -> IO PIN for mini v3

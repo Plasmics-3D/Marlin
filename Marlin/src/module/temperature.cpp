@@ -100,6 +100,10 @@
   #endif
 #endif
 
+#if HAS_INO_TRIDENT // INO declaration
+  #include "../libs/InoTrident.h"
+#endif
+
 #if HAS_MAX6675_LIBRARY || HAS_MAX31855_LIBRARY || HAS_MAX31865
   #define HAS_MAXTC_LIBRARIES 1
 #endif
@@ -250,9 +254,11 @@ PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
 
   #endif
 
+  //TEMP_##n##_CS_PIN
+  #warning Dont forget to write TEMP_##n##_CS_PIN in maxtc init
   #define MAXTC_INIT(n, M) \
       MAX##M max##M##_##n = MAX##M( \
-        TEMP_##n##_CS_PIN \
+        TEMP_##n##_PIN \
         OPTARG(_MAX31865_##n##_SW, TEMP_##n##_MOSI_PIN) \
         OPTARG(TEMP_SENSOR_##n##_USES_SW_SPI, TEMP_##n##_MISO_PIN, TEMP_##n##_SCK_PIN) \
         OPTARG(LARGE_PINMAP, HIGH) \
@@ -289,7 +295,7 @@ PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
     #define _MAX31865_2_SW TEMP_SENSOR_2_USES_SW_SPI
 
     #if TEMP_SENSOR_IS_MAX(0, 31865)
-      MAXTC_INIT(0, 31865);
+      MAXTC_INIT(0, 31865);  // INITIALIZATION PROBABLY IS BEING DONE HERE
     #endif
     #if TEMP_SENSOR_IS_MAX(1, 31865)
       MAXTC_INIT(1, 31865);
@@ -304,6 +310,42 @@ PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
   #endif
 
   #undef MAXTC_INIT
+
+#endif
+
+//
+// Initialize INO objects/SPI
+//
+#if HAS_INO_TRIDENT
+
+  #define INO_INIT(n) \
+      InoTrident ino_##n = InoTrident( \
+        TEMP_##n##_CS_PIN \
+        OPTARG(_INO_##n##_SW, TEMP_##n##_MOSI_PIN) \
+        OPTARG(TEMP_SENSOR_##n##_USES_SW_SPI, TEMP_##n##_MISO_PIN, TEMP_##n##_SCK_PIN) \
+        OPTARG(LARGE_PINMAP, HIGH) \
+      )
+
+  #define _INO_0_SW TEMP_SENSOR_0_USES_SW_SPI
+  #define _INO_1_SW TEMP_SENSOR_1_USES_SW_SPI
+  #define _INO_2_SW TEMP_SENSOR_2_USES_SW_SPI
+  
+  #if TEMP_SENSOR_IS_MAX(0, 31865)
+    INO_INIT(0);
+    //InoTrident ino_0 = InoTrident(TEMP_0_CS_PIN, TEMP_0_MOSI_PIN, TEMP_0_MISO_PIN, TEMP_0_SCK_PIN);
+  #endif
+  #if TEMP_SENSOR_IS_MAX(1, 31865)
+    INO_INIT(1);
+  #endif
+  #if TEMP_SENSOR_IS_MAX(2, 31865)
+    INO_INIT(2);
+  #endif
+
+  #undef _INO_0_SW
+  #undef _INO_1_SW
+  #undef _INO_2_SW
+
+  #undef INO_INIT
 
 #endif
 
@@ -1612,6 +1654,8 @@ void Temperature::mintemp_error(const heater_id_t heater_id) {
         tr_state_machine[e].run(temp_hotend[e].celsius, temp_hotend[e].target, (heater_id_t)e, THERMAL_PROTECTION_PERIOD, THERMAL_PROTECTION_HYSTERESIS);
       #endif
 
+      // Maybe put settargettemp for ino here ???
+
       temp_hotend[e].soft_pwm_amount = (temp_hotend[e].celsius > temp_range[e].mintemp || is_hotend_preheating(e)) && temp_hotend[e].celsius < temp_range[e].maxtemp ? (int)get_pid_output_hotend(e) >> 1 : 0;
 
       #if WATCH_HOTENDS
@@ -2164,8 +2208,10 @@ void Temperature::task() {
         #elif TEMP_SENSOR_IS_MAX_TC(0)
           #if TEMP_SENSOR_0_IS_MAX31865
             return TERN(LIB_INTERNAL_MAX31865,
-              max31865_0.temperature(raw),
-              max31865_0.temperature(MAX31865_SENSOR_OHMS_0, MAX31865_CALIBRATION_OHMS_0)
+              //max31865_0.temperature(raw),
+              //max31865_0.temperature(MAX31865_SENSOR_OHMS_0, MAX31865_CALIBRATION_OHMS_0)
+              ino_0.temperature(raw),
+              ino_0.temperature(MAX31865_SENSOR_OHMS_0, MAX31865_CALIBRATION_OHMS_0) // This TERN is where you update the temp from ino
             );
           #else
             return (int16_t)raw * 0.25;
@@ -2410,6 +2456,23 @@ void Temperature::updateTemperaturesFromRawValues() {
 
   #if TEMP_SENSOR_IS_MAX_TC(0)
     temp_hotend[0].setraw(READ_MAX_TC(0));
+    //MAX31865 &INOref = max31865_0;
+    //INOref.setTargetTemperature(temp_hotend[0].target);
+    //max31865_0.setTargetTemperature(temp_hotend[0].target);
+    
+    // Check if PID values have been changed
+    //if(max31865_0.kP != temp_hotend[0].pid.p() || max31865_0.kI != temp_hotend[0].pid.i() || max31865_0.kD != temp_hotend[0].pid.d()){
+    //  max31865_0.updateInoPID(temp_hotend[0].pid.p() , temp_hotend[0].pid.i(), temp_hotend[0].pid.d());
+    //}
+
+    ino_0.setTargetTemperature(temp_hotend[0].target);
+    
+    // Check if PID values have been changed
+    if(ino_0.kP != temp_hotend[0].pid.p() || ino_0.kI != temp_hotend[0].pid.i() || ino_0.kD != temp_hotend[0].pid.d()){
+      ino_0.updateInoPID(temp_hotend[0].pid.p() , temp_hotend[0].pid.i(), temp_hotend[0].pid.d());
+    }
+
+
   #endif
   #if TEMP_SENSOR_IS_MAX_TC(1)
     temp_hotend[1].setraw(READ_MAX_TC(1));
@@ -2543,6 +2606,11 @@ void Temperature::init() {
   #endif
   #if TEMP_SENSOR_IS_ANY_MAX_TC(2) && PIN_EXISTS(TEMP_2_CS)
     OUT_WRITE(TEMP_2_CS_PIN, HIGH);
+  #endif
+
+  
+  #if HAS_INO_TRIDENT
+    ino_0.begin();
   #endif
 
   // Setup objects for library-based polling of MAX TCs
@@ -3184,7 +3252,7 @@ void Temperature::disable_all_heaters() {
       #elif TEMP_SENSOR_IS_ANY_MAX_TC(1)
         #define THERMO_SEL(A,B,C) B
         #define MAXTC_CS_WRITE(V)  WRITE(TEMP_1_CS_PIN, V)
-      #elif TEMP_SENSOR_IS_ANY_MAX_TC(2)
+      #elif TEMP_SENSOR_IS_ANY_MAX_TC(2) 
         #define THERMO_SEL(A,B,C) C
         #define MAXTC_CS_WRITE(V)  WRITE(TEMP_2_CS_PIN, V)
       #endif
@@ -3238,19 +3306,25 @@ void Temperature::disable_all_heaters() {
       #endif
 
       #if HAS_MAX31865
-        MAX31865 &max865ref = THERMO_SEL(max31865_0, max31865_1, max31865_2);
-        max_tc_temp = TERN(LIB_INTERNAL_MAX31865, max865ref.readRaw(), max865ref.readRTD_with_Fault()); // readRaw reads the temp from sensor
+        //MAX31865 &max865ref = THERMO_SEL(max31865_0, max31865_1, max31865_2);
+        //max_tc_temp = TERN(LIB_INTERNAL_MAX31865, max865ref.readRaw(), max865ref.readRTD_with_Fault()); // readRaw reads the temp from sensor
+        
+        //max_tc_temp = max865ref.readTempActualRaw();
+
+        InoTrident &inoref = THERMO_SEL(ino_0, ino_1, ino_2);
+        max_tc_temp = inoref.readTempActualRaw();
+        
       #endif
     #endif
 
     // Handle an error. If there have been more than THERMOCOUPLE_MAX_ERRORS, send an error over serial.
     // Either way, return the TMAX for the thermocouple to trigger a maxtemp_error()
-    if (max_tc_temp & MAX_TC_ERROR_MASK) {
+    if (max_tc_temp & 0b00000001) { // max_tc_temp & MAX_TC_ERROR_MASK
       max_tc_errors[hindex]++;
 
-      if (max_tc_errors[hindex] > THERMOCOUPLE_MAX_ERRORS) {
+      if (max_tc_errors[hindex] > 0) { // THERMOCOUPLE_MAX_ERRORS
+        //SERIAL_ECHOPGM("Temp measurement error! ");
         SERIAL_ERROR_START();
-        SERIAL_ECHOPGM("Temp measurement error! ");
         #if HAS_MAX31855
           SERIAL_ECHOPGM("MAX31855 Fault: (", max_tc_temp & 0x7, ") >> ");
           if (max_tc_temp & 0x1)
@@ -3260,28 +3334,42 @@ void Temperature::disable_all_heaters() {
           else if (max_tc_temp & 0x4)
             SERIAL_ECHOLNPGM("Short to VCC");
         #elif HAS_MAX31865
-          const uint8_t fault_31865 = max865ref.readFault(); 
-          max865ref.clearFault();
-          if (fault_31865) { // Reading fails here
-            SERIAL_EOL();
-            SERIAL_ECHOLNPGM("\nMAX31865 Fault: (", fault_31865, ")  >>");
-            if (fault_31865 & MAX31865_FAULT_HIGHTHRESH)
-              SERIAL_ECHOLNPGM("RTD High Threshold");
-            if (fault_31865 & MAX31865_FAULT_LOWTHRESH)
-              SERIAL_ECHOLNPGM("RTD Low Threshold");
-            if (fault_31865 & MAX31865_FAULT_REFINLOW)
-              SERIAL_ECHOLNPGM("REFIN- > 0.85 x V bias");
-            if (fault_31865 & MAX31865_FAULT_REFINHIGH)
-              SERIAL_ECHOLNPGM("REFIN- < 0.85 x V bias (FORCE- open)");
-            if (fault_31865 & MAX31865_FAULT_RTDINLOW)
-              SERIAL_ECHOLNPGM("REFIN- < 0.85 x V bias (FORCE- open)");
-            if (fault_31865 & MAX31865_FAULT_OVUV)
-              SERIAL_ECHOLNPGM("Under/Over voltage");
+          //const uint8_t fault_31865 = max865ref.readFault(); 
+          //max865ref.clearFault();
+          uint16_t err_cfg_rply =  inoref.readErrorConfigReg(); // Byte1 -> error, Byte2 -> config
+          uint8_t fault_ino = err_cfg_rply >> 8 ;
+          
+          if (fault_ino) { // Reading fails here
+            // 0 x 0 | TempOvershoot | OpenCircuit | NoHeartbeat | HeatingSlow | HeatingFast |  NoTempRead | 0
+            SERIAL_ECHOPGM("Temperature INO Fault >>");
+            //if (fault_ino & 0b01000000){
+            //  SERIAL_ECHOPGM(" Temperature Overshoot"); // PLACEHOLDER
+            //}
+            if (fault_ino & 0b00100000){
+              SERIAL_ECHOPGM(" Open Circuit");
+            }
+            if (fault_ino & 0b00010000){
+              SERIAL_ECHOPGM(" No heartbeat");
+            }
+            
+            if (fault_ino & 0b00001100){
+              SERIAL_ECHOPGM(" No steady heating");
+            }else if (fault_ino & 0b00001000){
+              SERIAL_ECHOPGM(" Heating too fast");
+            }else if (fault_ino & 0b00000100){
+              SERIAL_ECHOPGM(" Heating too slow");
+            }
+
+            if (fault_ino & 0b00000010){
+              SERIAL_ECHOPGM(" No temp read");
+            }
+
           }
         #else // MAX6675
           SERIAL_ECHOLNPGM("MAX6675 Fault: Open Circuit");
         #endif
-
+        SERIAL_ECHOLNPGM(" INO Error (# ", fault_ino, ")");
+        
         // Set thermocouple above max temperature (TMAX)
         max_tc_temp = THERMO_SEL(TEMP_SENSOR_0_MAX_TC_TMAX, TEMP_SENSOR_1_MAX_TC_TMAX, TEMP_SENSOR_2_MAX_TC_TMAX) << (MAX_TC_DISCARD_BITS + 1);
       }
@@ -3298,6 +3386,8 @@ void Temperature::disable_all_heaters() {
     #endif
 
     THERMO_TEMP(hindex) = max_tc_temp;
+
+    //SERIAL_ECHOLNPGM("testing echo (", max_tc_temp, ")"); // can be used as debug message
 
     return max_tc_temp;
   }

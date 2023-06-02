@@ -71,3 +71,9 @@
 #endif
 
 #include "pins_MKS_ROBIN_NANO_V3_common.h"
+
+//Thermocouple pinouts
+#define TEMP_0_SCK_PIN EXP2_02_PIN  // PA5 //SCK
+#define TEMP_0_MISO_PIN EXP2_01_PIN // PA6 // MISO
+#define TEMP_0_MOSI_PIN EXP2_06_PIN // PA7  // MOSI
+#define TEMP_0_CS_PIN  PD8          // HEATER_0_PIN // PE5 -> E1 CS PIN for mks nano v3

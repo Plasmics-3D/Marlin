@@ -252,12 +252,12 @@
 #define EXP1_07_PIN                         PD11
 #define EXP1_08_PIN                         PD10
 
-#define EXP2_01_PIN                         PA6
-#define EXP2_02_PIN                         PA5
+#define EXP2_01_PIN                         PA6 // MISO
+#define EXP2_02_PIN                         PA5 //SCK
 #define EXP2_03_PIN                         PE8
 #define EXP2_04_PIN                         PE10
 #define EXP2_05_PIN                         PE11
-#define EXP2_06_PIN                         PA7
+#define EXP2_06_PIN                         PA7  // MOSI
 #define EXP2_07_PIN                         PE12
 #define EXP2_08_PIN                         -1    // RESET
 
