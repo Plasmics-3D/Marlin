@@ -440,8 +440,15 @@
   #define NEOPIXEL_PIN                      PA8   // LED driving pin
 #endif
 
-// INO pinouts
+// INO 0 pinouts
 #define TEMP_0_SCK_PIN PA5
 #define TEMP_0_MISO_PIN PA6
 #define TEMP_0_MOSI_PIN PA7
-#define TEMP_0_CS_PIN PD3 // PD3 -> IO PIN for mini v3
+#define TEMP_0_CS_PIN PB5 // PD3 -> IO PIN for mini v3 
+
+/* it needs E1 Steppers*/
+// INO 1 pinouts
+//#define TEMP_1_SCK_PIN PA5
+//#define TEMP_1_MISO_PIN PA6
+//#define TEMP_1_MOSI_PIN PA7
+//#define TEMP_1_CS_PIN PA15

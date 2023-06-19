@@ -1265,6 +1265,19 @@ class Temperature {
       static raw_adc_t read_max_tc(TERN_(HAS_MULTI_MAX_TC, const uint8_t hindex=0));
     #endif
 
+    // INO Trident
+    #if HAS_INO_TRIDENT
+      #define INO_COUNT TEMP_SENSOR_IS_INO(0) + TEMP_SENSOR_IS_INO(1) + TEMP_SENSOR_IS_INO(2)
+      //#warning this part needs more attention. Important for multitool
+      #if INO_COUNT > 1
+        #define HAS_MULTI_INO 1
+        #define READ_INO(N) read_ino(N)
+      #else
+        #define READ_INO(N) read_ino()
+      #endif
+      static raw_adc_t read_ino(TERN_(HAS_MULTI_INO, const uint8_t hindex=0));
+    #endif
+
     #if HAS_AUTO_FAN
       #if ENABLED(POWER_OFF_WAIT_FOR_COOLDOWN)
         static bool autofans_on;

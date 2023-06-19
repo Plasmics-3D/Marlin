@@ -77,14 +77,6 @@
   #define CONTROLLER_FAN_PIN            FAN1_PIN
 #endif
 
-// INO SPI SECTION
-//if the TEMP_SENSOR value of - 5 is enabled in the configuration file, it will work
-#define TEMP_0_MISO_PIN SD_MISO_PIN   //SDO Same as SD card SPI
-#define TEMP_0_SCK_PIN SD_SCK_PIN     //CLK Same as SD card SPI
-#define TEMP_0_MOSI_PIN SD_MOSI_PIN   //SDI Same as SD card SPI
-#define TEMP_0_CS_PIN EXP1_02_PIN     //It is on expansion port (EXP1)
-
-
 #if HAS_TMC_UART
   /**
    * TMC220x stepper drivers
@@ -109,3 +101,11 @@
     #define E0_SLAVE_ADDRESS 3
   #endif
 #endif
+
+
+// INO SPI SECTION
+//if the TEMP_SENSOR value of - 5 is enabled in the configuration file, it will work
+#define TEMP_0_MISO_PIN SD_MISO_PIN   //SDO Same as SD card SPI
+#define TEMP_0_SCK_PIN SD_SCK_PIN     //CLK Same as SD card SPI
+#define TEMP_0_MOSI_PIN SD_MOSI_PIN   //SDI Same as SD card SPI
+#define TEMP_0_CS_PIN EXP1_02_PIN     //It is on expansion port (EXP1) PA15

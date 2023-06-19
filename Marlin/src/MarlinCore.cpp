@@ -1247,6 +1247,13 @@ void setup() {
     OUT_WRITE(TEMP_1_CS_PIN, HIGH);
   #endif
 
+  #if TEMP_SENSOR_IS_INO(0)
+    OUT_WRITE(TEMP_0_CS_PIN, HIGH);  // Disable
+  #endif
+  #if TEMP_SENSOR_IS_INO(1)
+    OUT_WRITE(TEMP_1_CS_PIN, HIGH);  // Disable
+  #endif
+
   #if ENABLED(DUET_SMART_EFFECTOR) && PIN_EXISTS(SMART_EFFECTOR_MOD)
     OUT_WRITE(SMART_EFFECTOR_MOD_PIN, LOW);   // Put Smart Effector into NORMAL mode
   #endif

@@ -488,3 +488,10 @@
 
 // Include common SKR pins
 #include "pins_BTT_SKR_common.h"
+
+// INO SECTION
+//#define TEMP_0_CS_PIN   TEMP_0_PIN
+//#define TEMP_0_MISO_PIN EXP2_01_PIN
+//#define TEMP_0_MOSI_PIN EXP2_06_PIN
+//#define TEMP_0_SCK_PIN  EXP2_02_PIN
+

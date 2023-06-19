@@ -67,7 +67,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V3_0 // BOARD_MKS_ROBIN_NANO_V3_1 // BOARD_BTT_OCTOPUS_V1_1 // BOARD_BTT_SKR_MINI_E3_V2_0
+  #define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V2_0 // BOARD_BTT_SKR_MINI_E3_V3_0 // BOARD_MKS_ROBIN_NANO_V3_1 // BOARD_BTT_OCTOPUS_V1_1 // BOARD_BTT_SKR_MINI_E3_V2_0
 #endif
 
 /**
@@ -78,7 +78,7 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT 2 // robin: -1 // octopus: 1
+#define SERIAL_PORT 2 // miniv3 2 // robin: -1 // octopus: 1
 
 /**
  * Serial Port Baud Rate
@@ -100,7 +100,7 @@
  * Currently Ethernet (-2) is only supported on Teensy 4.1 boards.
  * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT_2 -1 // robin 3 // octopus: -1
+#define SERIAL_PORT_2 -1 // miniv3 -1 // robin 3 // octopus: -1
 //#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
 
 /**
@@ -115,7 +115,7 @@
 //#define BLUETOOTH
 
 // Name displayed in the LCD "Ready" message and Info menu
-#define CUSTOM_MACHINE_NAME "Plasmics Octopus"
+#define CUSTOM_MACHINE_NAME "Plasmics Delta"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like https://www.uuidgenerator.net/version4
@@ -207,7 +207,7 @@
 
 // This defines the number of extruders
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 1
+#define EXTRUDERS 1 // 2
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
 #define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
@@ -525,8 +525,17 @@
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  *
  */
-#define TEMP_SENSOR_0 -5 // -5
-#define TEMP_SENSOR_1 0
+
+/**
+ * INO Trident Setting
+ *
+ * -10: Enable Ino to respective temp sensor
+ *
+ * 
+ * 
+*/
+#define TEMP_SENSOR_0 -10 // -10
+#define TEMP_SENSOR_1 0 // -10
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_4 0
@@ -544,13 +553,19 @@
 #define DUMMY_THERMISTOR_998_VALUE  25
 #define DUMMY_THERMISTOR_999_VALUE 100
 
-//It was used for adafruit libraries to be activated
-//#define USE_ADAFRUIT_MAX31865 1
-//#define HAS_MAX31865 1
-//#define LIB_MAX31865 1
-
 // Enable INO Trident here
 #define HAS_INO_TRIDENT 1
+
+#if TEMP_SENSOR_IS_INO(0)
+  // Placeholder for Ino - 1
+#endif
+#if TEMP_SENSOR_IS_INO(1)
+  // Placeholder for Ino - 2
+#endif
+#if TEMP_SENSOR_IS_INO(2)
+  // Placeholder for Ino - 3
+#endif
+
 
 // Resistor values when using MAX31865 sensors (-5) on TEMP_SENSOR_0 / 1
 #if TEMP_SENSOR_IS_MAX_TC(0)
@@ -617,7 +632,7 @@
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
 #define HEATER_0_MAXTEMP 500
-#define HEATER_1_MAXTEMP 275
+#define HEATER_1_MAXTEMP 500
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
 #define HEATER_4_MAXTEMP 275
@@ -901,7 +916,7 @@
  // #define DELTA_CALIBRATION_MENU
 
   // G33 Delta Auto-Calibration. Enable EEPROM_SETTINGS to store results.
-  #define DELTA_AUTO_CALIBRATION
+  //#define DELTA_AUTO_CALIBRATION
 
   #if ENABLED(DELTA_AUTO_CALIBRATION)
     // Default number of probe points : n*n (1 -> 7)
@@ -1104,7 +1119,7 @@
 //#define USE_WMAX_PLUG
 
 // Enable pullup for all endstops to prevent a floating state
-#define ENDSTOPPULLUPS
+//#define ENDSTOPPULLUPS
 #if DISABLED(ENDSTOPPULLUPS)
   // Disable ENDSTOPPULLUPS to set pullups individually
   //#define ENDSTOPPULLUP_XMIN
@@ -1746,7 +1761,7 @@
  *  - Use a low value (i.e., Z_MIN_POS) if the nozzle falls down to the bed.
  *  - Use a large value (i.e., Z_MAX_POS) if the bed falls down, away from the nozzle.
  */
-//#define Z_IDLE_HEIGHT Z_HOME_POS
+#define Z_IDLE_HEIGHT Z_HOME_POS
 
 //#define Z_CLEARANCE_FOR_HOMING  4 // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                     // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.

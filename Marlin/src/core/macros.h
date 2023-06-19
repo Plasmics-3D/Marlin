@@ -758,6 +758,8 @@
 #define _HAS_E_TEMP(N) || TEMP_SENSOR(N)
 #define HAS_E_TEMP_SENSOR (0 REPEAT(EXTRUDERS, _HAS_E_TEMP))
 #define TEMP_SENSOR_IS_MAX_TC(T) (TEMP_SENSOR(T) == -5 || TEMP_SENSOR(T) == -3 || TEMP_SENSOR(T) == -2)
+// INO Config
+#define TEMP_SENSOR_IS_INO(T) (TEMP_SENSOR(T) == -10)
 
 #define _UI_NONE          0
 #define _UI_ORIGIN      101

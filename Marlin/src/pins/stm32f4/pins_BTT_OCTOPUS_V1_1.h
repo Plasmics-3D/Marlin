@@ -38,4 +38,10 @@
 #define TEMP_0_MOSI_PIN PA7
 #define TEMP_0_CS_PIN PD3 // PD3 -> E3 CS PIN for octopus
 
+//INO pinouts
+#define TEMP_1_SCK_PIN PA5
+#define TEMP_1_MISO_PIN PA6
+#define TEMP_1_MOSI_PIN PA7
+#define TEMP_1_CS_PIN PB6 // PD3 -> E3 CS PIN for octopus
+
 #include "pins_BTT_OCTOPUS_V1_common.h"

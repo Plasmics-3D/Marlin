@@ -677,6 +677,24 @@
 #endif
 
 /**
+ * Compatibility layer for Ino Trident(SPI) boards
+ */
+#if HAS_INO_TRIDENT
+  #if TEMP_SENSOR_IS_INO(0)
+    #define TEMP_SENSOR_0_HAS_SPI_PINS 1
+  #endif
+
+  #if TEMP_SENSOR_IS_INO(1)
+    #define TEMP_SENSOR_1_HAS_SPI_PINS 1
+  #endif
+
+  #if TEMP_SENSOR_IS_INO(2)
+    #define TEMP_SENSOR_2_HAS_SPI_PINS 1
+  #endif
+
+#endif
+
+/**
  * Compatibility layer for MAX (SPI) temp boards
  */
 #if HAS_MAX_TC
@@ -2311,7 +2329,7 @@
 //
 // ADC Temp Sensors (Thermistor or Thermocouple with amplifier ADC interface)
 //
-#define HAS_ADC_TEST(P) (TEMP_SENSOR(P) && PIN_EXISTS(TEMP_##P) && !TEMP_SENSOR_IS_MAX_TC(P) && !TEMP_SENSOR_##P##_IS_DUMMY)
+#define HAS_ADC_TEST(P) (TEMP_SENSOR(P) && PIN_EXISTS(TEMP_##P) && !TEMP_SENSOR_IS_MAX_TC(P) && !TEMP_SENSOR_##P##_IS_DUMMY && !TEMP_SENSOR_IS_INO(P)) // INO ADDED HERE 
 #if HOTENDS > 0 && HAS_ADC_TEST(0)
   #define HAS_TEMP_ADC_0 1
 #endif
@@ -2355,7 +2373,7 @@
   #define HAS_TEMP_ADC_REDUNDANT 1
 #endif
 
-#define HAS_TEMP(N) (TEMP_SENSOR_IS_MAX_TC(N) || EITHER(HAS_TEMP_ADC_##N, TEMP_SENSOR_##N##_IS_DUMMY))
+#define HAS_TEMP(N) (TEMP_SENSOR_IS_MAX_TC(N) || EITHER(HAS_TEMP_ADC_##N, TEMP_SENSOR_##N##_IS_DUMMY) || TEMP_SENSOR_IS_INO(N)) // INO ADDED HERE
 #if HAS_HOTEND && HAS_TEMP(0)
   #define HAS_TEMP_HOTEND 1
 #endif
